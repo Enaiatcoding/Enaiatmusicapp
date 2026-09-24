@@ -227,3 +227,9 @@ h1,li .t b{unicode-bidi:plaintext}
 @media(pointer:coarse){.desk{display:none}}
 @media(max-width:820px){.desk{display:none}.vol{display:flex;margin-top:2px}.ic.mini{width:36px;height:36px}}
 @media(max-height:640px){.vol{display:none!important}}
+
+/* ===== v6: round disc on every phone ===== */
+.disc{--d:min(240px,62vw);width:var(--d);height:var(--d);aspect-ratio:auto;flex:none}
+.disc img{display:block;width:100%;height:100%;aspect-ratio:1;border-radius:50%;object-fit:cover}
+@media(max-width:820px){.disc{--d:104px}}
+@media(max-height:640px){.disc{--d:76px}}
