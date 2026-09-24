@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="enaiat">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050816">
+<title>Enaiat Music App</title>
+<link rel="icon" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="bg"><i></i><i></i><i></i></div>
+<canvas id="fx"></canvas>
+
+<div class="app">
+  <header class="top">
+    <div class="brand"><img src="logo.png" alt="Enaiat logo"><div><b>Enaiat</b><span>Music App</span></div></div>
+    <div class="actions">
+      <button class="btn" id="themeBtn" aria-label="Change theme"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.5 0 2-1 1.5-2s0-2 1.5-2h2a4 4 0 0 0 4-4c0-5-4.5-10-9-10z"/><circle cx="7.5" cy="11" r="1"/><circle cx="11" cy="7.5" r="1"/><circle cx="16" cy="8" r="1"/></svg><span>Themes</span></button>
+      <label class="btn desk" for="folderInput"><svg viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg><span>Folder</span></label>
+      <label class="btn primary" for="fileInput"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Add music</span></label>
+      <input type="file" id="fileInput" accept="audio/*,.mp3,.m4a,.wav,.ogg,.flac,.aac,.opus,.weba" multiple class="sr">
+      <input type="file" id="folderInput" webkitdirectory multiple class="sr">
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="player">
+      <div class="disc-wrap"><div class="disc" id="disc"><img src="logo.png" alt=""></div></div>
+      <h1 id="title">No song playing</h1>
+      <p id="sub">Add music to get started</p>
+      <canvas id="viz" width="600" height="90"></canvas>
+      <div class="seek"><span id="cur">0:00</span><input type="range" id="seek" min="0" max="1000" value="0" aria-label="Seek"><span id="dur">0:00</span></div>
+      <div class="controls">
+        <button class="ic" id="shuffle" aria-label="Shuffle"><svg viewBox="0 0 24 24"><path d="M16 3h5v5M4 20 21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg></button>
+        <button class="ic" id="prev" aria-label="Previous"><svg viewBox="0 0 24 24" class="fill"><path d="M6 5v14M19 5 9 12l10 7z"/></svg></button>
+        <button class="ic play" id="play" aria-label="Play"><svg viewBox="0 0 24 24" class="fill"><path d="M7 4v16l14-8z"/></svg></button>
+        <button class="ic" id="next" aria-label="Next"><svg viewBox="0 0 24 24" class="fill"><path d="M18 5v14M5 5l10 7-10 7z"/></svg></button>
+        <button class="ic" id="repeat" aria-label="Repeat" data-mode="0"><svg viewBox="0 0 24 24"><path d="M17 2l4 4-4 4M3 11V9a3 3 0 0 1 3-3h15M7 22l-4-4 4-4M21 13v2a3 3 0 0 1-3 3H3"/></svg></button>
+      </div>
+      <div class="vol"><button class="ic mini" id="mute" aria-label="Mute"><svg viewBox="0 0 24 24"><path d="M11 5 6 9H2v6h4l5 4zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14"/></svg></button><input type="range" id="vol" min="0" max="1" step="0.01" value="0.8" aria-label="Volume"></div>
+    </section>
+
+    <section class="list">
+      <div class="list-head"><h2>Your library <small id="count">0 songs</small></h2>
+        <input type="search" id="search" placeholder="Search songs…"></div>
+      <div class="scroll"><ul id="tracks"></ul>
+      <div class="empty" id="empty">
+        <p>Your library is empty</p>
+        <p>Songs are saved on this device and play without internet.</p>
+        <label class="btn primary big" for="fileInput"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Add music</span></label>
+      </div></div>
+    </section>
+  </main>
+
+  <footer>Created by <b>Enaiat</b></footer>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-box">
+    <h3>Choose a theme <button class="ic" id="closeSheet" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></h3>
+    <div class="themes" id="themes"></div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<audio id="audio" preload="metadata"></audio>
+<script src="app.js"></script>
+</body>
+</html>
