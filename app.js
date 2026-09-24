@@ -13,6 +13,11 @@ const dbp = new Promise((res, rej) => {
 const store = async mode => (await dbp).transaction("songs", mode).objectStore("songs");
 const req = r => new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); });
 
+const MIME = { mp3: "audio/mpeg", m4a: "audio/mp4", mp4: "audio/mp4", wav: "audio/wav", ogg: "audio/ogg", opus: "audio/ogg", flac: "audio/flac", aac: "audio/aac", weba: "audio/webm" };
+function blobOf(t) {
+  const type = (t.blob && t.blob.type) || t.type || MIME[t.ext] || "audio/mpeg";
+  return new Blob([t.buf || t.blob], { type });
+}
 async function load() {
   tracks = await req((await store("readonly")).getAll());
   render();
@@ -24,7 +29,9 @@ async function addFiles(files) {
   for (const f of list) {
     toast("Adding " + (added + 1) + " of " + list.length + "…", true);
     const name = f.name.replace(/\.[^.]+$/, "").replace(/[_]+/g, " ");
-    await req((await store("readwrite")).add({ name, type: f.type, size: f.size, blob: f }));
+    const ext = (f.name.split(".").pop() || "").toLowerCase();
+    const buf = await f.arrayBuffer();
+    await req((await store("readwrite")).add({ name, ext, type: f.type || MIME[ext] || "audio/mpeg", size: f.size, buf }));
     added++;
   }
   await load();
@@ -58,7 +65,7 @@ function render() {
     if (i === idx) li.className = "now";
     li.innerHTML = `<div class="n">${i === idx && !audio.paused ? "♫" : i + 1}</div><div class="t"><b></b><small>${(t.size / 1048576).toFixed(1)} MB</small></div><button class="x" aria-label="Delete song"><svg viewBox="0 0 24 24"><path d="M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14"/></svg></button>`;
     li.querySelector("b").textContent = t.name;
-    li.onclick = () => play(i);
+    li.onclick = () => { unmute(); play(i); };
     li.querySelector(".x").onclick = e => { e.stopPropagation(); if (confirm("Delete this song?")) removeTrack(t.id); };
     ul.appendChild(li);
   });
@@ -84,7 +91,7 @@ function play(i) {
   if (!tracks[i]) return;
   idx = i; window._cur = tracks[i].id;
   if (curURL) URL.revokeObjectURL(curURL);
-  curURL = URL.createObjectURL(tracks[i].blob);
+  curURL = URL.createObjectURL(blobOf(tracks[i]));
   audio.src = curURL;
   setInfo(); setupViz();
   audio.play().catch(() => {});
@@ -98,6 +105,7 @@ function step(d) {
   play((idx + d + tracks.length) % tracks.length);
 }
 $("play").onclick = () => {
+  unmute();
   if (idx < 0 && tracks.length) return play(0);
   audio.paused ? audio.play() : audio.pause();
 };
@@ -110,6 +118,7 @@ $("repeat").onclick = e => {
   e.currentTarget.dataset.mode = repeat;
 };
 audio.onplay = audio.onpause = syncPlay;
+audio.onerror = () => toast("Cannot play this song. Delete it and add it again.");
 audio.onended = () => {
   if (repeat === 2) { audio.currentTime = 0; audio.play(); }
   else if (repeat === 1 || idx < tracks.length - 1 || shuffle) step(1);
@@ -135,6 +144,9 @@ function syncVol() {
   const off = audio.muted || audio.volume === 0;
   $("mute").innerHTML = off ? VOL.off : VOL.on;
   $("vol").value = off ? 0 : audio.volume;
+}
+function unmute() {
+  if (audio.muted || audio.volume === 0) { audio.muted = false; if (audio.volume === 0) audio.volume = lastVol || 0.8; syncVol(); }
 }
 $("mute").onclick = () => {
   if (audio.muted || audio.volume === 0) { audio.muted = false; if (audio.volume === 0) audio.volume = lastVol; }
